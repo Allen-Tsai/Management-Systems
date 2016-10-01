@@ -12,39 +12,31 @@ namespace WindowsFormsApplication1
 {
     public partial class Form3 : Form
     {
-        private MySqlConnection mysqlCon = null;
-        private string sqlCmd = string.Empty;
-
-        public Form3()
+        private static DatabaseConnection dbc_;
+        public Form3(DatabaseConnection dbc)
         {
             InitializeComponent();
-            sqlCmd = string.Format("Server=127.0.0.1;Database=test;Uid=root;Pwd=;Charset=utf8");
-            mysqlCon = new MySqlConnection(sqlCmd);
-            if (mysqlCon.State == ConnectionState.Closed)
-            {
-                mysqlCon.Open();
-            }
+            dbc_ = dbc;
         }
-
-        
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            if(textBox1.Text==""||textBox2.Text==""||textBox3.Text==""||textBox4.Text==""||
-                textBox5.Text==""||textBox6.Text=="")
+            if (textBox1.Text == "" || textBox2.Text == "" || textBox3.Text == "" || textBox4.Text == "" ||
+                textBox5.Text == "" || textBox6.Text == "")
             {
                 MessageBox.Show("有数据字段为空！", "提示");
                 return;
             }
-
-            string sql = string.Format
-                ("update STUDENT set NAME ='" + textBox2.Text + "', SEX ='" + textBox3.Text
-                + "', QQ='" + textBox4.Text + "', PHONUMBER='" + textBox5.Text
-                + "', DORM ='" + textBox6.Text + "' WHERE SID ='" + textBox1.Text+"'");
             try
             {
-                MySqlCommand cmd = new MySqlCommand(sql, mysqlCon);
-                if (cmd.ExecuteNonQuery() != 0)
+                string[] str = new string[] { };
+                str[0] = textBox1.Text;
+                str[1] = textBox2.Text;
+                str[2] = textBox3.Text;
+                str[3] = textBox4.Text;
+                str[4] = textBox5.Text;
+                str[5] = textBox6.Text;
+                if (dbc_.Update(str))
                 {
                     MessageBox.Show("数据修改成功！", "提示");
                     this.Close();
@@ -54,6 +46,7 @@ namespace WindowsFormsApplication1
             {
                 MessageBox.Show("数据修改失败！" + ex, "提示", MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
+                button2_Click_1(sender, e);
             }
         }
 

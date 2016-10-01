@@ -12,66 +12,33 @@ namespace WindowsFormsApplication1
 {
     public partial class Form6 : Form
     {
-        private MySqlConnection mysqlCon = null;
-        private string sqlCmd = string.Empty;
-        public string data;
-
-        public Form6()
+        private static DatabaseConnection dbc_;
+        public Form6(DatabaseConnection dbc)
         {
             InitializeComponent();
-            sqlCmd = string.Format("Server=127.0.0.1;Database=test;Uid=root;Pwd=;Charset=utf8");
-            mysqlCon = new MySqlConnection(sqlCmd);
-            if (mysqlCon.State == ConnectionState.Closed)
-            {
-                mysqlCon.Open();
-            }
+            dbc_ = dbc;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            bool flag = false;
-            string sql = "SELECT SID,NAME,SEX,QQ,PHONUMBER,DORM FROM student WHERE NAME = '"
-                + textBox1.Text + "'";
-            MySqlCommand cmd;
-            MySqlDataReader reader = null;
             try
             {
-                cmd = new MySqlCommand(sql, mysqlCon);
-
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
+                string str = dbc_.SearchByName(textBox1.Text);
+                if(str!=null)
                 {
-                    string str = null;
-                    for (int i = 0; i <= 5; i++)
-                    {
-                        switch (i)
-                        {
-                            case 0: str += "学号："; break;
-                            case 1: str += "姓名："; break;
-                            case 2: str += "性别："; break;
-                            case 3: str += "QQ号："; break;
-                            case 4: str += "手机号："; break;
-                            case 5: str += "宿舍："; break;
-                        }
-                        str += reader[i];
-                        str += "|";
-                    }
                     MessageBox.Show("数据检索成功！\n" + str, "提示");
-                    flag = true;
+                    this.Close();
                 }
-                if (flag == false)
+                else
                 {
                     MessageBox.Show("未在数据库中查询到此数据！", "提示");
+                    button2_Click(sender, e);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("查询错误！" + ex, "提示", MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
-            }
-            finally
-            {
-                reader.Close();
             }
         }
 

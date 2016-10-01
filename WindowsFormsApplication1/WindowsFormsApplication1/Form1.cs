@@ -15,16 +15,12 @@ namespace WindowsFormsApplication1
 
     public partial class Form1 : Form
     {
-        private MySqlConnection mysqlCon = null;
-        private string sqlCmd = string.Empty;
-
+        private static DatabaseConnection dbc;
         public Form1()
         {
             InitializeComponent();
             //进行数据库初始化工作
-            sqlCmd = string.Format("Server=127.0.0.1;Database=test;Uid=root;Pwd=;Charset=utf8");
-            mysqlCon = new MySqlConnection(sqlCmd);
-            mysqlCon.Open();
+            dbc = new DatabaseConnection();
             listBox1.Items.Add("学号\t\t姓名\t性别\tQQ\t\t手机号\t\t宿舍\t");
         }
 
@@ -33,13 +29,7 @@ namespace WindowsFormsApplication1
             /* 检测数据库有没有连接成功 */
             try
             {
-                if (mysqlCon.State == ConnectionState.Open)
-                {
-                    mysqlCon.Close();
-                }
-                sqlCmd = string.Format("Server=127.0.0.1;Database=test;Uid=root;Pwd=;Charset=utf8");
-                mysqlCon = new MySqlConnection(sqlCmd);
-                mysqlCon.Open();
+                MySqlConnection Mycon = dbc.GetConnection();
                 MessageBox.Show("数据库连接成功！", "提示");
             }
             catch (Exception ex)
@@ -53,61 +43,17 @@ namespace WindowsFormsApplication1
         private void button3_Click(object sender, EventArgs e)
         {
             //显示全部
-            MySqlCommand cmd;
-            MySqlDataReader reader = null;
-            string sql = "select SID,NAME,SEX,QQ,PHONUMBER,DORM from student ";
-
+            
             try
             {
-                cmd = new MySqlCommand(sql, mysqlCon);
                 List<string> list = new List<string>();
-
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    string str = null;
-                    for (int i = 0; i <= 5; i++)
-                    {
-                        str += reader[i];
-                        str += "\t";
-                    }
-                    list.Add(str);
-                }
+                list = dbc.ListAll();
                 listBox1.Items.Clear();
                 listBox1.Items.Add("学号\t\t姓名\t性别\tQQ\t\t手机号\t\t宿舍\t");
                 foreach (string s in list)
                 {
                     listBox1.Items.Add(s);
                 }
-                reader.Close();
-                /*
-                string sql = "select * from student ";
-                cmd = new MySqlCommand(sql, mysqlCon);
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    if (reader.HasRows)
-                    {
-
-                        listBox1.Items.Add("编号:" + reader.GetString(0)
-                            + "|姓名:" + reader.GetString(1)
-                            + "|性别:" + reader.GetString(2)
-                            + "|QQ:" + reader.GetString(3)
-                            + "|手机号:" + reader.GetString(4)
-                            + "|宿舍:" + reader.GetString(5));
-                        /*
-                        MessageBox.Show
-                            ("编号:" + reader.GetString(0) 
-                            + "|姓名:" + reader.GetString(1) 
-                            + "|性别:" + reader.GetString(2) 
-                            + "|QQ:" + reader.GetString(3)
-                            + "|手机号:" + reader.GetString(4)
-                            + "|宿舍:" + reader.GetString(5));
-                    
-                         
-                     }
-                }*/
             }
             catch (Exception ex)
             {
@@ -125,20 +71,20 @@ namespace WindowsFormsApplication1
 
         private void 添加数据ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form2 form2 = new Form2();
+            Form2 form2 = new Form2(dbc);
             form2.Show();
             //this.Hide();
         }
 
         private void 修改数据ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form3 form3 = new Form3();
+            Form3 form3 = new Form3(dbc);
             form3.Show();
         }
 
         private void 删除数据ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form5 form5 = new Form5();
+            Form5 form5 = new Form5(dbc);
             form5.Show();
         }
 
@@ -149,13 +95,13 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SearchByID sb = new SearchByID();
+            SearchByID sb = new SearchByID(dbc);
             sb.Show();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Form6 f6 = new Form6();
+            Form6 f6 = new Form6(dbc);
             f6.Show();
         }
 
@@ -178,29 +124,11 @@ namespace WindowsFormsApplication1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            MySqlCommand cmd;
-            MySqlDataReader reader = null;
-            string sql = "select SID,NAME,SEX,QQ,PHONUMBER,DORM from student ";
-
             try
             {
                 List<string> list = new List<string>();
 
-                cmd = new MySqlCommand(sql, mysqlCon);
-
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    string str = null;
-                    for (int i = 0; i <= 5; i++)
-                    {
-                        str += reader[i];
-                        str += "\t";
-                    }
-                    list.Add(str);
-
-                }
+                list = dbc.ListAll();
                 list.Sort();
                 listBox1.Items.Clear();
                 listBox1.Items.Add("学号\t\t姓名\t性别\tQQ\t\t手机号\t\t宿舍\t");
@@ -208,7 +136,6 @@ namespace WindowsFormsApplication1
                 {
                     listBox1.Items.Add(s);
                 }
-                reader.Close();
             }
             catch (Exception ex)
             {

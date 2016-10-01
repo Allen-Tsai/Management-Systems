@@ -13,18 +13,11 @@ namespace WindowsFormsApplication1
 {
     public partial class Form2 : Form
     {
-        private MySqlConnection mysqlCon = null;
-        private string sqlCmd = string.Empty;
-
-        public Form2()
+        private static DatabaseConnection dbc_;
+        public Form2(DatabaseConnection dbc)
         {
             InitializeComponent();
-            sqlCmd = string.Format("Server=127.0.0.1;Database=test;Uid=root;Pwd=;Charset=utf8");
-            mysqlCon = new MySqlConnection(sqlCmd);
-            if (mysqlCon.State == ConnectionState.Closed)
-            {
-                mysqlCon.Open();
-            }
+            dbc_ = dbc;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -35,14 +28,16 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("有数据字段为空！", "提示");
                 return;
             }
-            string sql = string.Format
-                ("insert into STUDENT(SID,NAME,SEX,QQ,PHONUMBER,DORM) values('"+
-                textBox1.Text + "','" + textBox2.Text + "', '" + textBox3.Text + "', '"
-                + textBox4.Text + "', '" + textBox5.Text + "', '" + textBox6.Text+"')");
             try
             {
-                MySqlCommand cmd = new MySqlCommand(sql, mysqlCon);
-                if (cmd.ExecuteNonQuery() != 0)
+                string []str = new string[]{};
+                str[0]=textBox1.Text;
+                str[1]=textBox2.Text;
+                str[2]=textBox3.Text;
+                str[3]=textBox4.Text;
+                str[4]=textBox5.Text;
+                str[5]=textBox6.Text;
+                if (dbc_.Insert(str))
                 {
                     MessageBox.Show("数据添加成功！", "提示");
                     this.Close();
@@ -51,6 +46,7 @@ namespace WindowsFormsApplication1
             {
                 MessageBox.Show("数据添加失败！"+ex, "提示", MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
+                button2_Click(sender, e);
             }
         }
 
