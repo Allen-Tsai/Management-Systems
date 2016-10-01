@@ -1,2 +1,3 @@
 # Management-Systems
-这个项目设计得很不合理。自己做着玩的。千万去参考。
+They are not for educating.
+Don't reference them for improving yourself.
